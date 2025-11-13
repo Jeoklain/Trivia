@@ -1,96 +1,170 @@
-let rightAnswers = 0;
+// Variáveis de estado globais
+let currentQuestions = [];
+let currentQuestionIndex = 0;
+let score = 0;
+const QUIZ_AMOUNT = 5; 
+const quizContainer = document.getElementById('quiz-container');
 
 const translateData = async (text) => {
     try {
-        const response = await fetch(`https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=pt-BR&q=${encodeURIComponent(text)}`);
+        const decodedText = new DOMParser().parseFromString(text, "text/html").documentElement.textContent;
+        const response = await fetch(`https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=pt-BR&q=${encodeURIComponent(decodedText )}`);
         const data = await response.json();
         return data[0][0];
     } catch (error) {
-        console.error('Error translating text:', error);
+        console.warn('Aviso: Falha na tradução. Usando texto original.', error);
         return text;
     }
 };
 
-const fetchData = async () => {
-    try {
-        const container = document.getElementById('trivia-container');
-        let categoria = '9';
-        let dificuldade = 'easy';
 
-        // seleção da categoria
-        await new Promise(resolve => {
-            const botoesCat = document.querySelectorAll('.botao-cat');
-            botoesCat.forEach(botao => {
-                botao.onclick = () => {
-                    if (botao.innerText === "Jogos"){
-                        categoria = '15';
-                    } else if (botao.innerText === "Esportes"){
-                        categoria = '21';
-                    }
-                    resolve();
-                    container.innerHTML = 'Escolha a dificuldade:<br>';
-                };    
-            });
+const renderDifficultySelection = (category) => {
+    quizContainer.innerHTML = `
+        <h2>Escolha a Dificuldade</h2>
+        <div class="difficulty-selection">
+            <button class="btn difficulty-btn" data-difficulty="easy">Fácil</button>
+            <button class="btn difficulty-btn" data-difficulty="medium">Média</button>
+            <button class="btn difficulty-btn" data-difficulty="hard">Difícil</button>
+        </div>
+    `;
+   
+    document.querySelectorAll('.difficulty-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const difficulty = button.getAttribute('data-difficulty');
+            fetchQuestions(category, difficulty);
         });
+    });
+};
 
-        // seleção da dificuldade
-        await new Promise(resolve => {
-            const dificuldades = ['Fácil', 'Média', 'Difícil'];
-            dificuldades.forEach(dif => {
-                const botao = document.createElement('button');
-                botao.innerText = dif;
-                botao.onclick = () => {
-                    if (botao.innerText === "Difícil"){
-                        dificuldade = 'hard';
-                    } else if (botao.innerText === "Média"){
-                        dificuldade = 'medium';
-                    }
-                    resolve();
-                    container.innerHTML = '';
-                }; 
-                container.appendChild(botao);
-            });
+
+const renderLoading = () => {
+    quizContainer.innerHTML = `
+        <div class="loading-message">
+            <p>Carregando e traduzindo ${QUIZ_AMOUNT} questões...</p>
+        </div>
+    `;
+};
+
+const renderQuestion = async (questionData) => {
+    const question = questionData.question;
+    const allAnswers = questionData.allAnswers;
+
+    quizContainer.innerHTML = `
+        <h2>Questão ${currentQuestionIndex + 1} de ${QUIZ_AMOUNT}</h2>
+        <p class="question-text">${question}</p>
+        <div class="answer-options">
+            ${allAnswers.map((answer, index) => 
+                `<button class="btn answer-btn" data-answer-index="${index}">${answer}</button>`
+            ).join('')}
+        </div>
+    `;
+
+    document.querySelectorAll('.answer-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            handleAnswerClick(event.target, questionData.correct_answer);
         });
-        
-        const response = await fetch(`https://opentdb.com/api.php?amount=3&category=${categoria}&difficulty=${dificuldade}`);
-        const data = await response.json();
-        
-        for (const [index, item] of data.results.entries()) {
-            const questionDiv = document.createElement('div');
-            questionDiv.innerHTML = `<h3>Q${index + 1}: ${decodeURIComponent(await translateData(item.question))}</h3>`;
-            container.appendChild(questionDiv);
-            const answerDiv = document.createElement('div');
-            const answers = [...item.incorrect_answers, item.correct_answer];
-            answers.sort(() => Math.random() - 0.5);
-            for (const answer of answers) {
-                const answerBtn = document.createElement('button');
-                answerBtn.innerText = decodeURIComponent(await translateData(answer));
-                answerDiv.appendChild(answerBtn);
+    });
+};
+
+const renderFinalScore = () => {
+    quizContainer.innerHTML = `
+        <div class="score-screen">
+            <h2>Quiz Concluído!</h2>
+            <p>Seu Placar Final:</p>
+            <p class="score-text">${score} acerto(s) de ${QUIZ_AMOUNT}</p>
+            <button class="btn" onclick="initQuiz()">Jogar Novamente</button>
+        </div>
+    `;
+};
+const handleAnswerClick = (clickedButton, correctAnswer) => {
+   
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.disabled = true;
+    });
+
+    const selectedAnswer = clickedButton.innerText;
+    if (selectedAnswer === correctAnswer) {
+        score++;
+        clickedButton.classList.add('correct');
+    } else {
+        clickedButton.classList.add('incorrect');
+        document.querySelectorAll('.answer-btn').forEach(btn => {
+            if (btn.innerText === correctAnswer) {
+                btn.classList.add('correct');
             }
-            container.appendChild(answerDiv);
-
-            const translatedCorrectAnswer = decodeURIComponent(await translateData(item.correct_answer));
-            
-            await new Promise(resolve => {
-                const buttons = answerDiv.querySelectorAll('button');
-                buttons.forEach(button => {
-                    button.onclick = () => {
-                        if (button.innerText === translatedCorrectAnswer) {
-                            alert('Correct!');
-                            rightAnswers++;
-                        } else {
-                            alert(`Wrong! The correct answer was: ${translatedCorrectAnswer}`);
-                        }
-                        container.innerHTML = '';
-                        resolve();
-                    };
-                });
-            });
+        });
+    }
+    setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < QUIZ_AMOUNT) {
+            renderQuestion(currentQuestions[currentQuestionIndex]);
+        } else {
+            renderFinalScore();
         }
-        container.innerHTML = `<h2>You got ${rightAnswers} out of ${data.results.length} correct!</h2>`;
+    }, 1500);
+};
+
+const fetchQuestions = async (category, difficulty) => {
+    renderLoading();
+    
+    const url = `https://opentdb.com/api.php?amount=${QUIZ_AMOUNT}&category=${category}&difficulty=${difficulty}&type=multiple`;
+    
+    try {
+        const response = await fetch(url );
+        const data = await response.json();
+
+        if (data.response_code !== 0) {
+            quizContainer.innerHTML = `<p>Erro ao buscar questões. Tente outra categoria ou dificuldade.</p><button class="btn" onclick="initQuiz()">Voltar</button>`;
+            return;
+        }
+
+        const processedQuestions = await Promise.all(data.results.map(async (item) => {
+            const question = new DOMParser().parseFromString(item.question, "text/html").documentElement.textContent;
+            const correctAnswer = new DOMParser().parseFromString(item.correct_answer, "text/html").documentElement.textContent;
+            const incorrectAnswers = item.incorrect_answers.map(ans => new DOMParser().parseFromString(ans, "text/html").documentElement.textContent);
+
+            const translatedQuestion = await translateData(question);
+            const translatedCorrectAnswer = await translateData(correctAnswer);
+            const translatedIncorrectAnswers = await Promise.all(incorrectAnswers.map(translateData));
+
+            const allAnswers = [translatedCorrectAnswer, ...translatedIncorrectAnswers];
+            allAnswers.sort(() => Math.random() - 0.5);
+
+            return { question: translatedQuestion, correct_answer: translatedCorrectAnswer, allAnswers: allAnswers };
+        }));
+
+        currentQuestions = processedQuestions;
+        currentQuestionIndex = 0;
+        score = 0;
+        renderQuestion(currentQuestions[currentQuestionIndex]);
+
     } catch (error) {
-        console.error('Error fetching trivia:', error);
+        console.error('Erro fatal ao buscar ou processar dados:', error);
+        quizContainer.innerHTML = `<p>Ocorreu um erro de rede ou processamento. Tente novamente.</p><button class="btn" onclick="initQuiz()">Voltar</button>`;
     }
 };
 
-fetchData();
+
+const initQuiz = () => {
+    currentQuestions = [];
+    currentQuestionIndex = 0;
+    score = 0;
+    quizContainer.innerHTML = `
+        <div id="initial-screen">
+            <h2>Bem-vindo(a) ao Trivia Quiz!</h2>
+            <p>Escolha uma categoria para começar:</p>
+            <div class="category-selection">
+                <button class="btn category-btn" data-category="9">Conhecimentos Gerais</button>
+                <button class="btn category-btn" data-category="15">Jogos</button>
+                <button class="btn category-btn" data-category="21">Esportes</button>
+            </div>
+        </div>
+    `;
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const category = button.getAttribute('data-category');
+            renderDifficultySelection(category);
+        });
+    });
+};
+initQuiz();

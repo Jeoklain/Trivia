@@ -3,14 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia</title>
+    <title>Trivia Quiz</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Trivia Questions</h1>
-    <div id="trivia-container">Escolha uma categoria:
-        <br><button class="botao-cat">Conhecimentos Gerais</button>
-        <button class="botao-cat">Jogos</button>
-        <button class="botao-cat">Esportes</button>
+    <div class="container">
+        <header>
+            <h1>Trivia Quiz</h1>
+        </header>
+        <main id="quiz-container">
+            <div id="initial-screen">
+                <h2>Bem-vindo(a) ao Trivia Quiz!</h2>
+                <p>Escolha uma categoria para começar:</p>
+                <div class="category-selection">
+                    <button class="btn category-btn" data-category="9">Conhecimentos Gerais</button>
+                    <button class="btn category-btn" data-category="15">Jogos</button>
+                    <button class="btn category-btn" data-category="21">Esportes</button>
+                </div>
+            </div>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>
