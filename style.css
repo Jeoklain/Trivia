@@ -33,3 +33,74 @@ main {
     justify-content: center;
     align-items: center;
 }
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    min-width: 150px;
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.category-selection, .difficulty-selection, .answer-options {
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.answer-options .btn {
+   width: 100%;
+    margin: 5px 0;
+    text-align: left;
+    padding: 15px;
+    white-space: normal;
+}
+
+.correct {
+    background-color: #28a745 !important; 
+    color: white;
+}
+
+.incorrect {
+    background-color: #dc3545 !important; 
+    color: white;
+}
+
+.score-screen h2 {
+    color: #007bff;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.loading-message {
+    font-size: 1.2em;
+    color: #007bff;
+    margin-top: 30px;
+}
+.score-screen p {
+    font-size: 1.8em; 
+    margin-bottom: 25px; 
+    font-weight: normal;
+}
+.highlight-score {
+    color: #28a745; 
+    font-size: 1.2em; 
+    font-weight: bold;
+}

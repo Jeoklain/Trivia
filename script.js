@@ -70,8 +70,8 @@ const renderFinalScore = () => {
     quizContainer.innerHTML = `
         <div class="score-screen">
             <h2>Quiz Concluído!</h2>
-            <p>Seu Placar Final:</p>
-            <p class="score-text">${score} acerto(s) de ${QUIZ_AMOUNT}</p>
+            <p>Parabéns! Seu placar final foi</p>
+          <p class="score-text"><span class="highlight-score">${score}</span> acerto(s) de ${QUIZ_AMOUNT}</p>
             <button class="btn" onclick="initQuiz()">Jogar Novamente</button>
         </div>
     `;
@@ -152,7 +152,7 @@ const initQuiz = () => {
     quizContainer.innerHTML = `
         <div id="initial-screen">
             <h2>Bem-vindo(a) ao Trivia Quiz!</h2>
-            <p>Escolha uma categoria para começar:</p>
+            <p>Escolha uma categoria para começar</p>
             <div class="category-selection">
                 <button class="btn category-btn" data-category="9">Conhecimentos Gerais</button>
                 <button class="btn category-btn" data-category="15">Jogos</button>
