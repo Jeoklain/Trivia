@@ -1,6 +1,6 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f7f6;
+    background-color: #9e62a7;
     color: #333;
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
 }
 
 .container {
-    background-color: #fff;
+    background-color: #fdfdfd;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -21,7 +21,7 @@ body {
 }
 
 header h1 {
-    color: #007bff;
+    color: #6e099c;
     margin-bottom: 20px;
     font-size: 2em;
 }
@@ -35,7 +35,7 @@ main {
 }
 
 .btn {
-    background-color: #007bff;
+    background-color: #980ed8;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -48,12 +48,12 @@ main {
 }
 
 .btn:hover:not(:disabled) {
-    background-color: #0056b3;
+    background-color: #980ed8;
     transform: translateY(-2px);
 }
 
 .btn:disabled {
-    background-color: #ccc;
+    background-color: #cccccc;
     cursor: not-allowed;
 }
 
@@ -84,14 +84,14 @@ main {
 }
 
 .score-screen h2 {
-    color: #007bff;
+    color: #980ed8;
     font-size: 2.5em;
     margin-bottom: 10px;
 }
 
 .loading-message {
     font-size: 1.2em;
-    color: #007bff;
+    color: #980ed8;
     margin-top: 30px;
 }
 .score-screen p {
